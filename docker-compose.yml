@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: maransa
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - postgres
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: maransa
+      PGPORT: 5432
+      PORT: 4000
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
